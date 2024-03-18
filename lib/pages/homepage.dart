@@ -24,6 +24,7 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       toDoList.add([_controller.text, false]);
     });
+    _controller.clear();
     Navigator.of(context).pop();
   }
 
@@ -34,7 +35,11 @@ class _HomepageState extends State<Homepage> {
         return DialogBox(
           controller: _controller,
           onSave: saveNewTask,
-          onCancel: () => Navigator.of(context).pop(),
+          // onCancel: () => Navigator.of(context).pop(),
+          onCancel: () {
+            Navigator.of(context).pop();
+            _controller.clear();
+          },
         );
       },
     );
