@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:to_do_list/util/dialog_box.dart';
 
 import '../util/todo_tile.dart';
@@ -14,15 +15,44 @@ class _HomepageState extends State<Homepage> {
   final _controller = TextEditingController();
   List toDoList = [];
 
+  @override
+  void initState() {
+    super.initState();
+    initHive();
+  }
+
+  void initHive() async {
+    await Hive.initFlutter();
+    await Hive.openBox('taskBox');
+    setState(() {
+      loadTasks();
+    });
+  }
+
+  void loadTasks() {
+    final taskBox = Hive.box('taskBox');
+    for (var i = 0; i < taskBox.length; i++) {
+      final task = taskBox.getAt(i);
+      toDoList.add([task[0], task[1]]);
+    }
+  }
+
   void checkBoxChanged(bool? value, int index) {
     setState(() {
       toDoList[index][1] = !toDoList[index][1];
+      Hive.box('taskBox')
+          .putAt(index, [toDoList[index][0], toDoList[index][1]]);
     });
+  }
+
+  void saveTask(String title, bool isCompleted) {
+    Hive.box('taskBox').add([title, isCompleted]);
   }
 
   void saveNewTask() {
     setState(() {
       toDoList.add([_controller.text, false]);
+      saveTask(_controller.text, false);
     });
     _controller.clear();
     Navigator.of(context).pop();
@@ -47,6 +77,7 @@ class _HomepageState extends State<Homepage> {
 
   void deleteTask(int index) {
     setState(() {
+      Hive.box('taskBox').deleteAt(index);
       toDoList.removeAt(index);
     });
   }
