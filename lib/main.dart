@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'pages/homepage.dart';
-import 'package:localstorage/localstorage.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
